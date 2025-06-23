@@ -1,0 +1,55 @@
+# -*- coding: utf-8 -*-
+"""
+
+@author: joseph@艾鍗學院 www.ittraining.com.tw
+Train logistic model with KFold cross-validator
+
+"""
+
+import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import KFold
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(n_samples=100, n_features=10, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1234)
+
+model = LogisticRegression()
+
+# Define KFold cross-validator
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# Store accuracy scores for each fold
+accuracy_scores = []
+
+# Perform K-Fold Cross Validation
+for train_index, valid_index in kf.split(X_train):
+    # Split the data into training and Validation sets
+    #print(valid_index)
+    X_train, X_valid = X[train_index], X[valid_index]
+    y_train, y_valid = y[train_index], y[valid_index]
+    
+    
+    model.fit(X_train, y_train)
+    
+    
+    y_pred = model.predict(X_valid)
+    
+    # Compute the accuracy for this fold
+    accuracy = accuracy_score(y_valid, y_pred)
+    accuracy_scores.append(accuracy)
+    
+    print(f"Fold accuracy: {accuracy:.4f}")
+
+# Output overall performance
+print(f"\nAverage accuracy across all folds: {np.mean(accuracy_scores):.4f}")
+
+# Predict test data 
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"test data accuracy: {accuracy:.4f}")
+print(y_pred)
+print(y_test)
+
